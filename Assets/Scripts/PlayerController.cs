@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour
         Run
     }
 
+    private PlayerState currentState;
+
     [SerializeField]
     private GameObject SpriteObject;
 
@@ -28,7 +30,8 @@ public class PlayerController : MonoBehaviour
     private Animator myAnimator;
     private SpriteRenderer mySpriteRenderer;
 
-    PlayerState currentState;
+    private bool isRight;
+    private float filpDistance;
 
 
     private void Awake()
@@ -37,6 +40,9 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         myAnimator = SpriteObject.GetComponent<Animator>();
         mySpriteRenderer = SpriteObject.GetComponent<SpriteRenderer>();
+
+        filpDistance = 50f;
+        isRight = true;
     }
 
     private void OnEnable()
@@ -44,20 +50,36 @@ public class PlayerController : MonoBehaviour
         playerControls.Enable();
     }
 
-    private void Update()
-    {
-        PlayerInput();
-    }
-
     private void FixedUpdate()
     {
-        LookAtMouse();
+        CheckFlip();
         Move();
     }
 
-    private void PlayerInput()
+    private void CheckFlip()
     {
-        //Vector2 movement = playerControls.Movement.Move.ReadValue<Vector2>();
+        // 마우스와 플레이어의 스크린 좌표 가져오기
+        Vector3 mouseScreenPoint = Input.mousePosition;
+        Vector3 playerScreenPoint = Camera.main.WorldToScreenPoint(transform.position);
+
+        if (isRight)
+        {
+            // 마우스가 캐릭터보다 왼쪽에 오면 뒤집기 
+            if (mouseScreenPoint.x < playerScreenPoint.x - filpDistance)
+            {
+                isRight = false;
+                mySpriteRenderer.flipX = true;
+            }
+        }
+        else
+        {
+            // 마우스가 캐릭터보다 오른쪽에 오면 뒤집기
+            if (mouseScreenPoint.x > playerScreenPoint.x + filpDistance)
+            {
+                isRight = true;
+                mySpriteRenderer.flipX = false;
+            }
+        }
     }
 
     private void Move()
@@ -86,21 +108,6 @@ public class PlayerController : MonoBehaviour
 
             // 마우스가 플레이어와 일정 거리만큼 가까워지면 정지
             rb.velocity = Vector2.zero;
-        }
-    }
-
-    private void LookAtMouse()
-    {
-        Vector3 mousePos = Input.mousePosition;
-        Vector3 playerScreenPoint = Camera.main.WorldToScreenPoint(transform.position);
-
-        if (mousePos.x < playerScreenPoint.x)
-        {
-            mySpriteRenderer.flipX = true;
-        }
-        else
-        {
-            mySpriteRenderer.flipX = false;
         }
     }
 
