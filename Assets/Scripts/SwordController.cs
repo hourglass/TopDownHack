@@ -30,22 +30,25 @@ public class SwordController : MonoBehaviour
     private float flipAngle;
 
     private bool isSwing;
+    private bool isReverse;
     private float swingDirection;
 
     private PlayerInput playerControls;
-    private SpriteRenderer mySpriteRenderer;
+    private SpriteRenderer swordSpriteRenderer;
 
 
     private void Awake()
     {
         playerControls = new PlayerInput();
-        mySpriteRenderer = sword.GetComponent<SpriteRenderer>();
+        swordSpriteRenderer = sword.GetComponent<SpriteRenderer>();
+        sword.transform.localPosition = swordPos;
 
         isRight = true;
         filpDistance = 50f;
         flipAngle = 0f;
 
         isSwing = false;
+        isReverse = false;
         swingDirection = 1f;
     }
 
@@ -57,12 +60,27 @@ public class SwordController : MonoBehaviour
     private void Start()
     {
         playerControls.Combat.Attack.started += _ => Attack();
+
+        isPause = false;
+    }
+
+    private bool isPause;
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            isPause = !isPause;
+            Debug.Log(isPause);
+        }
     }
 
     private void FixedUpdate()
     {
-        CheckFlip();
-        LookAtMouse();
+        if (!isPause) 
+        {
+            CheckFlip();
+            LookAtMouse();
+        }
     }
 
     void CheckFlip()
@@ -77,10 +95,15 @@ public class SwordController : MonoBehaviour
             if (mouseScreenPoint.x < playerScreenPoint.x - filpDistance)
             {
                 isRight = false;
-                mySpriteRenderer.flipX = false;
                 sword.transform.localPosition = new Vector3(-swordPos.x, swordPos.y, swordPos.z);
-                swingDirection = -1f;
                 flipAngle = -180f;
+
+                swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
+                swingDirection = -swingDirection;
+                if (isReverse)
+                { 
+                    sword.transform.localRotation = 
+                }
             }
         }
         else
@@ -89,10 +112,12 @@ public class SwordController : MonoBehaviour
             if (mouseScreenPoint.x > playerScreenPoint.x + filpDistance)
             {
                 isRight = true;
-                mySpriteRenderer.flipX = true;
                 sword.transform.localPosition = new Vector3(swordPos.x, swordPos.y, swordPos.z);
-                swingDirection = 1f;
                 flipAngle = 0f;
+
+                swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
+                swingDirection = -swingDirection;
+
             }
         }
     }
@@ -110,9 +135,33 @@ public class SwordController : MonoBehaviour
         // 아크탄젠트에 높이(Y)와 밑변을(X)를 넣어 각도를 구하기
         float angle = (Mathf.Atan2(distance.y, distance.x) * Mathf.Rad2Deg);
 
+        angle = angle + flipAngle;
+        if (angle < -180f)
+        {
+            angle = angle + 360f;
+        }
+
+        if (isRight)
+        {
+            angle = Mathf.Clamp(angle, -25f, 90f);
+        }
+        else
+        {
+            angle = Mathf.Clamp(angle, -90f, 25f);
+        }
+
         // 회전 값 적용
         // 바라보는 방향 = angle + 스프라이트 각도(-90f) + 들고 있는 각도(+90f)
-        Quaternion targetRotation = Quaternion.Euler(0f, 0f, angle + flipAngle);
+        Quaternion targetRotation;
+        if (!isReverse)
+        {
+            targetRotation = Quaternion.Euler(0f, 0f, angle);
+        }
+        else 
+        {
+            targetRotation = Quaternion.Euler(0f, 0f, angle + (swingDegree * -swingDirection));
+        }
+
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotSpeed * Time.deltaTime);
     }
 
@@ -126,7 +175,7 @@ public class SwordController : MonoBehaviour
 
     IEnumerator SwingCoroutine()
     {
-        float startAngle = transform.eulerAngles.z + (25f * swingDirection); ;
+        float startAngle = transform.eulerAngles.z;
         float targetAngle = startAngle + (swingDegree * swingDirection);
 
         float startSwordAngle = sword.transform.localEulerAngles.z;
@@ -151,10 +200,14 @@ public class SwordController : MonoBehaviour
             yield return null;
         }
 
+        swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
+        swingDirection = -swingDirection;
+
         // 마지막 각도 설정
         transform.eulerAngles = new Vector3(0f, 0f, targetAngle);
-        sword.transform.localEulerAngles = new Vector3(0f, 0f, startSwordAngle);
+        sword.transform.localEulerAngles = new Vector3(0f, 0f, targetSwordAngle);
 
         isSwing = false;
+        isReverse = !isReverse;
     }
 }

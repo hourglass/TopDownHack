@@ -33,7 +33,6 @@ public class PlayerController : MonoBehaviour
     private bool isRight;
     private float filpDistance;
 
-
     private void Awake()
     {
         playerControls = new PlayerInput();
