@@ -100,10 +100,12 @@ public class SwordController : MonoBehaviour
 
                 swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
                 swingDirection = -swingDirection;
+                /*  
                 if (isReverse)
                 { 
                     sword.transform.localRotation = 
                 }
+                */
             }
         }
         else
