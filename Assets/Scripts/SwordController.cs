@@ -8,33 +8,36 @@ using static UnityEditor.PlayerSettings;
 public class SwordController : MonoBehaviour
 {
     [SerializeField]
-    private GameObject sword;
+    private GameObject sword; // 검 프리팹 (무기 프리팹)
 
     [SerializeField]
-    private Vector3 swordPos;
+    private Vector3 swordPos; // 검 시작 위치 (무기 시작 위치)
 
-    [SerializeField]
-    private float rotSpeed;
+    // TODO:::플레이어 스크립트에만 입력을 받도록 변경
+    private PlayerInput playerControls;
+    private SpriteRenderer swordSpriteRenderer;
 
-    [SerializeField]
-    private float swingSpeed;
-
-    [SerializeField]
-    private float swingDegree;
-
-    [SerializeField]
-    private float swordDegree;
-
+    // TODO:::플레이어 스크립트에만 플립을 하도록 변경 
     private bool isRight;
     private float filpDistance;
     private float flipAngle;
 
-    private bool isSwing;
-    private bool isReverse;
-    private float swingDirection;
 
-    private PlayerInput playerControls;
-    private SpriteRenderer swordSpriteRenderer;
+    [SerializeField]
+    private float rotSpeed; // 검 마우스 추적 회전 속도
+
+    [SerializeField]
+    private float swingSpeed; // 검 휘두르기 회전 속도
+
+    [SerializeField]
+    private float swingDegree; // 휘두르는 검의 각도
+
+    [SerializeField]
+    private float swordDegree; // 휘두른 후 검의 최종 각도
+
+    private bool isSwing; // 공격 중인지 체크
+    private bool isReverse; // 검을 한번 휘두른 상태인지 체크
+    private float swingDirection; // 검을 휘두를 방향
 
 
     private void Awake()
@@ -60,27 +63,12 @@ public class SwordController : MonoBehaviour
     private void Start()
     {
         playerControls.Combat.Attack.started += _ => Attack();
-
-        isPause = false;
-    }
-
-    private bool isPause;
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            isPause = !isPause;
-            Debug.Log(isPause);
-        }
     }
 
     private void FixedUpdate()
     {
-        if (!isPause) 
-        {
-            CheckFlip();
-            LookAtMouse();
-        }
+        CheckFlip();
+        LookAtMouse();
     }
 
     void CheckFlip()
@@ -95,17 +83,15 @@ public class SwordController : MonoBehaviour
             if (mouseScreenPoint.x < playerScreenPoint.x - filpDistance)
             {
                 isRight = false;
-                sword.transform.localPosition = new Vector3(-swordPos.x, swordPos.y, swordPos.z);
                 flipAngle = -180f;
+                sword.transform.localPosition = new Vector3(-swordPos.x, swordPos.y, swordPos.z);
 
                 swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
                 swingDirection = -swingDirection;
-                /*  
-                if (isReverse)
-                { 
-                    sword.transform.localRotation = 
+                if(isReverse)
+                {
+                    sword.transform.localRotation = Quaternion.Euler(0f, 0f, swingDirection * -swordDegree);
                 }
-                */
             }
         }
         else
@@ -114,12 +100,15 @@ public class SwordController : MonoBehaviour
             if (mouseScreenPoint.x > playerScreenPoint.x + filpDistance)
             {
                 isRight = true;
-                sword.transform.localPosition = new Vector3(swordPos.x, swordPos.y, swordPos.z);
                 flipAngle = 0f;
+                sword.transform.localPosition = new Vector3(swordPos.x, swordPos.y, swordPos.z);
 
                 swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
                 swingDirection = -swingDirection;
-
+                if (isReverse)
+                {
+                    sword.transform.localRotation = Quaternion.Euler(0f, 0f, swingDirection * -swordDegree);
+                }
             }
         }
     }
@@ -185,11 +174,12 @@ public class SwordController : MonoBehaviour
 
         float duration = 0.5f;
         float time = 0f;
+        float progress = 0f;
 
-        while (time < duration)
+        while (progress < 1f)
         {
             // time / duration을 사용하여 progress 값을 계산
-            float progress = time / duration;
+            progress = time / duration;
             float progressPow = Mathf.Pow(progress, 3);
 
             Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetAngle);
