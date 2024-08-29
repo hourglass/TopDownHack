@@ -86,8 +86,8 @@ public class SwordController : MonoBehaviour
                 swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
 
                 flipAngle = -180f;
+                sword.transform.localPosition = new Vector3(-swordPos.x, swordPos.y, swordPos.z);
                 swingDirection = -swingDirection;
-                sword.transform.localPosition = new Vector3(swingDirection * swordPos.x, swordPos.y, swordPos.z);
                 if (isReverse)
                 {
                     sword.transform.localRotation = Quaternion.Euler(0f, 0f, swingDirection * swordDegree);
@@ -103,8 +103,8 @@ public class SwordController : MonoBehaviour
                 swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
 
                 flipAngle = 0f;
+                sword.transform.localPosition = new Vector3(swordPos.x, swordPos.y, swordPos.z);
                 swingDirection = -swingDirection;
-                sword.transform.localPosition = new Vector3(swingDirection * swordPos.x, swordPos.y, swordPos.z);
                 if (isReverse)
                 {
                     sword.transform.localRotation = Quaternion.Euler(0f, 0f, swingDirection * swordDegree);
