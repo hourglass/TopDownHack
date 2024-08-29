@@ -82,13 +82,13 @@ public class SwordController : MonoBehaviour
             // 마우스가 캐릭터보다 왼쪽에 오면 뒤집기
             if (mouseScreenPoint.x < playerScreenPoint.x - filpDistance)
             {
-                isRight = false;
-                flipAngle = -180f;
-                sword.transform.localPosition = new Vector3(-swordPos.x, swordPos.y, swordPos.z);
-
+                isRight = !isRight;
                 swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
+
+                flipAngle = -180f;
                 swingDirection = -swingDirection;
-                if(isReverse)
+                sword.transform.localPosition = new Vector3(swingDirection * swordPos.x, swordPos.y, swordPos.z);
+                if (isReverse)
                 {
                     sword.transform.localRotation = Quaternion.Euler(0f, 0f, swingDirection * swordDegree);
                 }
@@ -99,12 +99,12 @@ public class SwordController : MonoBehaviour
             // 마우스가 캐릭터보다 오른쪽에 오면 뒤집기
             if (mouseScreenPoint.x > playerScreenPoint.x + filpDistance)
             {
-                isRight = true;
-                flipAngle = 0f;
-                sword.transform.localPosition = new Vector3(swordPos.x, swordPos.y, swordPos.z);
-
+                isRight = !isRight;
                 swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
+
+                flipAngle = 0f;
                 swingDirection = -swingDirection;
+                sword.transform.localPosition = new Vector3(swingDirection * swordPos.x, swordPos.y, swordPos.z);
                 if (isReverse)
                 {
                     sword.transform.localRotation = Quaternion.Euler(0f, 0f, swingDirection * swordDegree);

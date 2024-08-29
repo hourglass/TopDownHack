@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -66,8 +67,7 @@ public class PlayerController : MonoBehaviour
             // 마우스가 캐릭터보다 왼쪽에 오면 뒤집기 
             if (mouseScreenPoint.x < playerScreenPoint.x - filpDistance)
             {
-                isRight = false;
-                mySpriteRenderer.flipX = true;
+                Flip();
             }
         }
         else
@@ -75,10 +75,15 @@ public class PlayerController : MonoBehaviour
             // 마우스가 캐릭터보다 오른쪽에 오면 뒤집기
             if (mouseScreenPoint.x > playerScreenPoint.x + filpDistance)
             {
-                isRight = true;
-                mySpriteRenderer.flipX = false;
+                Flip();
             }
         }
+    }
+
+    private void Flip()
+    {
+        isRight = !isRight;
+        mySpriteRenderer.flipX = !mySpriteRenderer.flipX;
     }
 
     private void Move()
