@@ -174,13 +174,13 @@ public class SwordController : MonoBehaviour
 
         float duration = 0.5f;
         float time = 0f;
-        float progress = 0f;
+        float progressPow = 0f;
 
-        while (progress < 1f)
+        while (progressPow < 1f)
         {
             // time / duration을 사용하여 progress 값을 계산
-            progress = time / duration;
-            float progressPow = Mathf.Pow(progress, 3);
+            float progress = time / duration;
+            progressPow = Mathf.Pow(progress, 3);
 
             Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetAngle);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, swingSpeed * progressPow);
