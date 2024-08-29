@@ -90,7 +90,7 @@ public class SwordController : MonoBehaviour
                 swingDirection = -swingDirection;
                 if(isReverse)
                 {
-                    sword.transform.localRotation = Quaternion.Euler(0f, 0f, swingDirection * -swordDegree);
+                    sword.transform.localRotation = Quaternion.Euler(0f, 0f, swingDirection * swordDegree);
                 }
             }
         }
@@ -107,7 +107,7 @@ public class SwordController : MonoBehaviour
                 swingDirection = -swingDirection;
                 if (isReverse)
                 {
-                    sword.transform.localRotation = Quaternion.Euler(0f, 0f, swingDirection * -swordDegree);
+                    sword.transform.localRotation = Quaternion.Euler(0f, 0f, swingDirection * swordDegree);
                 }
             }
         }
@@ -134,11 +134,11 @@ public class SwordController : MonoBehaviour
 
         if (isRight)
         {
-            angle = Mathf.Clamp(angle, -25f, 90f);
+            angle = Mathf.Clamp(angle, -45f, 90f);
         }
         else
         {
-            angle = Mathf.Clamp(angle, -90f, 25f);
+            angle = Mathf.Clamp(angle, -90f, 45f);
         }
 
         // 회전 값 적용
@@ -150,7 +150,7 @@ public class SwordController : MonoBehaviour
         }
         else 
         {
-            targetRotation = Quaternion.Euler(0f, 0f, angle + (swingDegree * -swingDirection));
+            targetRotation = Quaternion.Euler(0f, 0f, angle + (swingDegree * swingDirection));
         }
 
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotSpeed * Time.deltaTime);
@@ -167,10 +167,10 @@ public class SwordController : MonoBehaviour
     IEnumerator SwingCoroutine()
     {
         float startAngle = transform.eulerAngles.z;
-        float targetAngle = startAngle + (swingDegree * swingDirection);
+        float targetAngle = startAngle - (swingDegree * swingDirection);
 
         float startSwordAngle = sword.transform.localEulerAngles.z;
-        float targetSwordAngle = startSwordAngle + (swordDegree * swingDirection);
+        float targetSwordAngle = startSwordAngle - (swordDegree * swingDirection);
 
         float duration = 0.5f;
         float time = 0f;
