@@ -192,14 +192,12 @@ public class SwordController : MonoBehaviour
             yield return null;
         }
 
-        swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
-        swingDirection = -swingDirection;
-
         // 마지막 각도 설정
         transform.eulerAngles = new Vector3(0f, 0f, targetAngle);
         sword.transform.localEulerAngles = new Vector3(0f, 0f, targetSwordAngle);
 
         isSwing = false;
         isReverse = !isReverse;
+        swingDirection = -swingDirection;
     }
 }
