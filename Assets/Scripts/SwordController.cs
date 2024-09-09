@@ -199,5 +199,6 @@ public class SwordController : MonoBehaviour
         isSwing = false;
         isReverse = !isReverse;
         swingDirection = -swingDirection;
+        //swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
     }
 }
