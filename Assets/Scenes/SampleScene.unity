@@ -172,8 +172,8 @@ MonoBehaviour:
   swordPos: {x: 0.25, y: 0.05, z: 0}
   rotSpeed: 10
   swingSpeed: 5
-  swingDegree: 125
-  swordDegree: 125
+  swingDegree: 150
+  swordDegree: 150
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
