@@ -83,11 +83,12 @@ public class SwordController : MonoBehaviour
             if (mouseScreenPoint.x < playerScreenPoint.x - filpDistance)
             {
                 isRight = !isRight;
-                swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
-
                 flipAngle = -180f;
-                sword.transform.localPosition = new Vector3(-swordPos.x, swordPos.y, swordPos.z);
                 swingDirection = -swingDirection;
+
+                sword.transform.localPosition = new Vector3(-swordPos.x, swordPos.y, swordPos.z);
+                sword.transform.localRotation = Quaternion.Euler(0f, flipAngle, 0f);
+
                 if (isReverse)
                 {
                     sword.transform.localRotation = Quaternion.Euler(0f, 0f, swingDirection * swordDegree);
@@ -100,11 +101,12 @@ public class SwordController : MonoBehaviour
             if (mouseScreenPoint.x > playerScreenPoint.x + filpDistance)
             {
                 isRight = !isRight;
-                swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
-
                 flipAngle = 0f;
-                sword.transform.localPosition = new Vector3(swordPos.x, swordPos.y, swordPos.z);
                 swingDirection = -swingDirection;
+
+                sword.transform.localPosition = new Vector3(swordPos.x, swordPos.y, swordPos.z);
+                sword.transform.localRotation = Quaternion.Euler(0f, flipAngle, 0f);
+
                 if (isReverse)
                 {
                     sword.transform.localRotation = Quaternion.Euler(0f, 0f, swingDirection * swordDegree);
@@ -124,6 +126,7 @@ public class SwordController : MonoBehaviour
         Vector2 distance = mousePos - (Vector2)transform.position;
 
         // 아크탄젠트에 높이(Y)와 밑변을(X)를 넣어 각도를 구하기
+        // 바라보는 방향 = angle + 스프라이트 각도(-90f) + 들고 있는 각도(+90f)
         float angle = (Mathf.Atan2(distance.y, distance.x) * Mathf.Rad2Deg);
 
         angle = angle + flipAngle;
@@ -134,15 +137,13 @@ public class SwordController : MonoBehaviour
 
         if (isRight)
         {
-            angle = Mathf.Clamp(angle, -45f, 90f);
+            angle = Mathf.Clamp(angle, -25f, 75f);
         }
         else
         {
-            angle = Mathf.Clamp(angle, -90f, 45f);
+            angle = Mathf.Clamp(angle, -75f, 25f);
         }
 
-        // 회전 값 적용
-        // 바라보는 방향 = angle + 스프라이트 각도(-90f) + 들고 있는 각도(+90f)
         Quaternion targetRotation;
         if (!isReverse)
         {
@@ -180,7 +181,7 @@ public class SwordController : MonoBehaviour
         {
             // time / duration을 사용하여 progress 값을 계산
             float progress = time / duration;
-            progressPow = Mathf.Pow(progress, 3);
+            progressPow = Mathf.Pow(progress, 2);
 
             Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetAngle);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, swingSpeed * progressPow);
@@ -199,6 +200,5 @@ public class SwordController : MonoBehaviour
         isSwing = false;
         isReverse = !isReverse;
         swingDirection = -swingDirection;
-        //swordSpriteRenderer.flipX = !swordSpriteRenderer.flipX;
     }
 }
