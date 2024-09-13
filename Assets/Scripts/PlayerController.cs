@@ -8,6 +8,9 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
+    public  delegate bool GetIsSwingDel();
+    public static GetIsSwingDel getIsSwingDel;
+
     private enum PlayerState
     {
         Idle,
@@ -58,6 +61,8 @@ public class PlayerController : MonoBehaviour
 
     private void CheckFlip()
     {
+        if (getIsSwingDel()) { return; }
+
         // 마우스와 플레이어의 스크린 좌표 가져오기
         Vector3 mouseScreenPoint = Input.mousePosition;
         Vector3 playerScreenPoint = Camera.main.WorldToScreenPoint(transform.position);

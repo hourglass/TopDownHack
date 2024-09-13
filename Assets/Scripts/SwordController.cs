@@ -15,7 +15,6 @@ public class SwordController : MonoBehaviour
 
     // TODO:::플레이어 스크립트에만 입력을 받도록 변경
     private PlayerInput playerControls;
-    private SpriteRenderer swordSpriteRenderer;
 
     // TODO:::플레이어 스크립트에만 플립을 하도록 변경 
     private bool isRight;
@@ -39,11 +38,11 @@ public class SwordController : MonoBehaviour
     private bool isReverse; // 검을 한번 휘두른 상태인지 체크
     private float swingDirection; // 검을 휘두를 방향
 
-
     private void Awake()
     {
+        PlayerController.getIsSwingDel = GetIsSwing;
+
         playerControls = new PlayerInput();
-        swordSpriteRenderer = sword.GetComponent<SpriteRenderer>();
         sword.transform.localPosition = swordPos;
 
         isRight = true;
@@ -73,6 +72,8 @@ public class SwordController : MonoBehaviour
 
     void CheckFlip()
     {
+        if (isSwing) { return; }
+
         // 마우스와 플레이어의 스크린 좌표 가져오기
         Vector3 mouseScreenPoint = Input.mousePosition;
         Vector3 playerScreenPoint = Camera.main.WorldToScreenPoint(transform.parent.position);
@@ -165,6 +166,11 @@ public class SwordController : MonoBehaviour
         StartCoroutine(SwingCoroutine());
     }
 
+    bool GetIsSwing()
+    { 
+        return isSwing;
+    }
+
     IEnumerator SwingCoroutine()
     {
         float startAngle = transform.eulerAngles.z;
@@ -173,7 +179,7 @@ public class SwordController : MonoBehaviour
         float startSwordAngle = sword.transform.localEulerAngles.z;
         float targetSwordAngle = startSwordAngle - (swordDegree * swingDirection);
 
-        float duration = 0.5f;
+        float duration = 0.3f;
         float time = 0f;
         float progressPow = 0f;
 
