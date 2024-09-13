@@ -46,7 +46,7 @@ public class SwordController : MonoBehaviour
         sword.transform.localPosition = swordPos;
 
         isRight = true;
-        filpDistance = 50f;
+        filpDistance = 75f;
         flipAngle = 0f;
 
         isSwing = false;
@@ -138,11 +138,11 @@ public class SwordController : MonoBehaviour
 
         if (isRight)
         {
-            angle = Mathf.Clamp(angle, -25f, 75f);
+            angle = Mathf.Clamp(angle, -25f, 100f);
         }
         else
         {
-            angle = Mathf.Clamp(angle, -75f, 25f);
+            angle = Mathf.Clamp(angle, -100f, 25f);
         }
 
         Quaternion targetRotation;

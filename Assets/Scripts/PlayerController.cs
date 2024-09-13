@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
         myAnimator = SpriteObject.GetComponent<Animator>();
         mySpriteRenderer = SpriteObject.GetComponent<SpriteRenderer>();
 
-        filpDistance = 50f;
+        filpDistance = 75f;
         isRight = true;
     }
 
