@@ -24,6 +24,78 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     ""name"": ""PlayerInput"",
     ""maps"": [
         {
+            ""name"": ""Movement"",
+            ""id"": ""708cc195-a9c2-4b46-9c5e-5f5f264d25b4"",
+            ""actions"": [
+                {
+                    ""name"": ""Move"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""bd5c0d64-b0ae-4b49-b690-354c3266cea7"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""b45840f1-cebd-4a49-9b76-b606093f7644"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""35fac68c-2a5f-4ed4-88b2-b4f36ecda873"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""129a87df-57d4-4af5-a851-19c4785b2e66"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""b3e28d13-e88a-4194-a354-fd7bd2e5b395"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""ed879f38-a89b-4385-a15f-f74848e316f6"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                }
+            ]
+        },
+        {
             ""name"": ""Combat"",
             ""id"": ""ce60672b-7b41-420c-a181-0d51598af63d"",
             ""actions"": [
@@ -54,6 +126,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     ],
     ""controlSchemes"": []
 }");
+        // Movement
+        m_Movement = asset.FindActionMap("Movement", throwIfNotFound: true);
+        m_Movement_Move = m_Movement.FindAction("Move", throwIfNotFound: true);
         // Combat
         m_Combat = asset.FindActionMap("Combat", throwIfNotFound: true);
         m_Combat_Attack = m_Combat.FindAction("Attack", throwIfNotFound: true);
@@ -115,6 +190,52 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         return asset.FindBinding(bindingMask, out action);
     }
 
+    // Movement
+    private readonly InputActionMap m_Movement;
+    private List<IMovementActions> m_MovementActionsCallbackInterfaces = new List<IMovementActions>();
+    private readonly InputAction m_Movement_Move;
+    public struct MovementActions
+    {
+        private @PlayerInput m_Wrapper;
+        public MovementActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Move => m_Wrapper.m_Movement_Move;
+        public InputActionMap Get() { return m_Wrapper.m_Movement; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(MovementActions set) { return set.Get(); }
+        public void AddCallbacks(IMovementActions instance)
+        {
+            if (instance == null || m_Wrapper.m_MovementActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_MovementActionsCallbackInterfaces.Add(instance);
+            @Move.started += instance.OnMove;
+            @Move.performed += instance.OnMove;
+            @Move.canceled += instance.OnMove;
+        }
+
+        private void UnregisterCallbacks(IMovementActions instance)
+        {
+            @Move.started -= instance.OnMove;
+            @Move.performed -= instance.OnMove;
+            @Move.canceled -= instance.OnMove;
+        }
+
+        public void RemoveCallbacks(IMovementActions instance)
+        {
+            if (m_Wrapper.m_MovementActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IMovementActions instance)
+        {
+            foreach (var item in m_Wrapper.m_MovementActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_MovementActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public MovementActions @Movement => new MovementActions(this);
+
     // Combat
     private readonly InputActionMap m_Combat;
     private List<ICombatActions> m_CombatActionsCallbackInterfaces = new List<ICombatActions>();
@@ -160,6 +281,10 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         }
     }
     public CombatActions @Combat => new CombatActions(this);
+    public interface IMovementActions
+    {
+        void OnMove(InputAction.CallbackContext context);
+    }
     public interface ICombatActions
     {
         void OnAttack(InputAction.CallbackContext context);

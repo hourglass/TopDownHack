@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
 
     private PlayerInput playerControls;
     private Rigidbody2D rb;
+    private Vector2 movement;
 
     private Animator myAnimator;
     private SpriteRenderer mySpriteRenderer;
@@ -55,8 +56,10 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        GetInput();
         CheckFlip();
-        Move();
+        MoveUsingKeyboard();
+        //MoveUsingMouse();
     }
 
     private void CheckFlip()
@@ -91,7 +94,35 @@ public class PlayerController : MonoBehaviour
         mySpriteRenderer.flipX = !mySpriteRenderer.flipX;
     }
 
-    private void Move()
+    private void GetInput()
+    {
+        movement = playerControls.Movement.Move.ReadValue<Vector2>();
+    }
+
+    private void MoveUsingKeyboard()
+    {
+        rb.velocity = movement * moveSpeed * Time.deltaTime;
+
+        if (movement.x != 0 || movement.y != 0)
+        {
+            ChangeState(PlayerState.Run);
+        }
+        else
+        {
+            ChangeState(PlayerState.Idle);
+        }
+
+        if (isRight && movement.x < 0 || !isRight && movement.x > 0)
+        {
+            myAnimator.SetFloat("Reverse", -1f);
+        }
+        else
+        {
+            myAnimator.SetFloat("Reverse", 1f);
+        }
+    }
+
+    private void MoveUsingMouse()
     {
         // 마우스 커서의 위치를 받아오기
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -103,10 +134,7 @@ public class PlayerController : MonoBehaviour
 
         if (Vector2.Distance(mousePos, playerPos) > stopDistance)
         {
-            if (currentState != PlayerState.Run) 
-            { 
-                ChangeState(PlayerState.Run); 
-            }
+            ChangeState(PlayerState.Run);
 
             // 마우스 방향으로 이동
             rb.velocity = forward * moveSpeed * Time.deltaTime;
@@ -122,6 +150,11 @@ public class PlayerController : MonoBehaviour
 
     private void ChangeState(PlayerState state)
     {
+        if (currentState == state)
+        {
+            return;
+        }
+
         /*
         switch (state)
         {
